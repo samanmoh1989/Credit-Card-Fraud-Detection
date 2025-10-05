@@ -1,68 +1,74 @@
 # 🕵️‍♀️ Credit Card Fraud Detection
 
-**تشخیص تقلب در تراکنش‌های کارت اعتباری** با یادگیری ماشین و مدیریت عدم‌توازن شدید کلاس‌ها.  
-این مخزن چرخه‌ی کامل یک پروژه‌ی دیتا ساینس را پوشش می‌دهد:  
-**EDA → Preprocessing → Modeling → Handling Imbalance (SMOTE) → Threshold Tuning → Feature Importance → Saving & Inference**
-
-> **Note:** All source code and comments are in English; this README is Persian-first for clarity.
+A complete **end-to-end data science project** for detecting fraudulent credit card transactions using **machine learning** and **class imbalance handling (SMOTE)**.  
+This repository demonstrates a full data science workflow from EDA to deployment-ready model packaging.
 
 ---
 
-## فهرست مطالب
-- [مرور کلی](#مرور-کلی)
-- [دیتاست](#دیتاست)
-- [ساختار پروژه](#ساختار-پروژه)
-- [شروع سریع (Quick Start)](#شروع-سریع-quick-start)
-- [اجرای نوت‌بوک](#اجرای-نوتبوک)
-- [مدل‌سازی و عدم‌توازن](#مدلسازی-و-عدمتوازن)
-- [تنظیم آستانه (Threshold Tuning)](#تنظیم-آستانه-threshold-tuning)
-- [اهمیت ویژگی‌ها](#اهمیت-ویژگیها)
-- [نتایج نمونه](#نتایج-نمونه)
-- [ذخیره و استفاده از مدل](#ذخیره-و-استفاده-از-مدل)
-- [API اختیاری (FastAPI)](#api-اختیاری-fastapi)
-- [بهترین‌عمل‌ها برای داده‌ها](#بهترینعملها-برای-دادهها)
-- [توسعه‌دهی (Pre-commit/Makefile)](#توسعهدهی-pre-commitmakefile)
-- [نقشه راه](#نقشه-راه)
-- [مجوز](#مجوز)
-- [سپاس](#سپاس)
+## 📋 Table of Contents
+- [Overview](#overview)
+- [Dataset](#dataset)
+- [Project Structure](#project-structure)
+- [Quick Start](#quick-start)
+- [Notebook Workflow](#notebook-workflow)
+- [Modeling and Class Imbalance](#modeling-and-class-imbalance)
+- [Threshold Tuning](#threshold-tuning)
+- [Feature Importance](#feature-importance)
+- [Results](#results)
+- [Model Saving and Inference](#model-saving-and-inference)
+- [Optional API (FastAPI)](#optional-api-fastapi)
+- [Data Best Practices](#data-best-practices)
+- [Development (Pre-commit/Makefile)](#development-pre-commitmakefile)
+- [Roadmap](#roadmap)
+- [License](#license)
+- [Acknowledgements](#acknowledgements)
 
 ---
 
-## مرور کلی
-هدف: ساخت مدلی عملی برای شناسایی تقلب با **Precision/Recall** متعادل.  
-الگوریتم‌ها:
-- Baseline: **Logistic Regression** (با `class_weight="balanced"`)
-- Advanced: **Random Forest**
-- Imbalance: **SMOTE** روی داده‌ی آموزش
-- Tuning: منحنی **Precision–Recall** برای تعیین آستانه‌ی تصمیم
-- Explainability: **Feature Importances**
+## 🧠 Overview
+This project builds a fraud detection model using **Logistic Regression** and **Random Forest**, with special focus on **imbalanced data** and **performance metrics** such as Precision, Recall, F1, and ROC-AUC.
+
+### Pipeline Summary
+1. **Exploratory Data Analysis (EDA)**  
+2. **Data Preprocessing and Feature Scaling**  
+3. **Train-Test Split with Stratification**  
+4. **Model Training (Baseline & Advanced)**  
+5. **SMOTE Oversampling for Imbalanced Data**  
+6. **Threshold Tuning using Precision–Recall Curve**  
+7. **Feature Importance Analysis**  
+8. **Model Saving and Evaluation**  
 
 ---
 
-## دیتاست
-- نام: *Credit Card Fraud Detection (European cardholders)*  
-- اندازه: `284,807` تراکنش؛ تقلب‌ها: `492` (~0.17%)  
-- ستون‌ها: `Time`, `Amount`, `V1..V28` (ویژگی‌های ناشناس‌شده با PCA)، `Class` (۰=Normal، ۱=Fraud)
+## 📊 Dataset
+- **Source:** [Credit Card Fraud Detection Dataset (European cardholders)](https://www.kaggle.com/mlg-ulb/creditcardfraud)  
+- **Samples:** 284,807 transactions  
+- **Frauds:** 492 (≈0.17%)  
+- **Features:**  
+  - `Time`, `Amount`  
+  - `V1` to `V28` — anonymized PCA components  
+  - `Class` — Target variable (0 = Non-fraud, 1 = Fraud)
 
-> 🎯 فایل اصلی را دانلود کرده و در مسیر زیر قرار دهید (به‌صورت پیش‌فرض در گیت **رد** می‌شود):  
+> ⚠️ The dataset is excluded from Git due to size limits.  
+> Please place it manually under:
 ```
 data/raw/creditcard.csv
 ```
 
 ---
 
-## ساختار پروژه
+## 🧱 Project Structure
 ```
 cc-fraud-detection/
 ├─ data/
-│  ├─ raw/                # creditcard.csv (قرار دهید؛ commit نکنید)
-│  └─ processed/          # X_train/X_test/y_train/y_test (خروجی split؛ commit نکنید)
+│  ├─ raw/                # contains creditcard.csv (ignored in Git)
+│  └─ processed/          # contains processed train/test splits
 ├─ models/
-│  └─ rf_smote_v1.joblib  # مدل ذخیره‌شده + scaler + features + threshold
+│  └─ rf_smote_v1.joblib  # saved model + scaler + features + threshold
 ├─ notebooks/
 │  └─ Credit Card Fraud Detection.ipynb
 ├─ reports/
-│  └─ figures/            # نمودارهای EDA/نتایج
+│  └─ figures/            # EDA plots, correlation, PR curve, etc.
 ├─ src/
 │  ├─ data.py
 │  ├─ features.py
@@ -80,9 +86,9 @@ cc-fraud-detection/
 
 ---
 
-## شروع سریع (Quick Start)
+## ⚡ Quick Start
 ```bash
-# 1) Create & activate venv
+# 1) Create and activate a virtual environment
 python -m venv .venv
 # Windows:
 .\.venv\Scripts\activate
@@ -93,7 +99,7 @@ source .venv/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
 
-# 3) (Optional) Enable pre-commit hooks
+# 3) (Optional) Setup pre-commit hooks
 pip install pre-commit
 pre-commit install
 
@@ -103,63 +109,69 @@ jupyter lab
 
 ---
 
-## اجرای نوت‌بوک
-نوت‌بوک زیر را باز و سلول‌ها را به‌ترتیب اجرا کنید:  
+## 📔 Notebook Workflow
+Run this notebook:
 ```
 notebooks/Credit Card Fraud Detection.ipynb
 ```
-**جریان کار:**
-1) **EDA:** توزیع کلاس‌ها، آمار توصیفی، هیستوگرام `Amount` (نسخه‌ی log)، همبستگی‌ها  
-2) **Preprocessing:** `train_test_split` با `stratify`، استانداردسازی `Time/Amount`  
-3) **Baseline:** Logistic Regression  
-4) **Random Forest:** مدل پیشرفته و مقایسه  
-5) **SMOTE:** oversampling فقط روی Train  
-6) **Threshold Tuning:** انتخاب آستانه با **PR Curve**  
-7) **Feature Importance:** تحلیل ویژگی‌های مهم  
-8) **Saving:** ذخیره‌ی artifact (مدل + اسکیلر + لیست فیچرها + آستانه)
+
+### Steps
+1. **EDA:** Class distribution, summary statistics, histograms, log-transform of `Amount`, correlations.  
+2. **Preprocessing:** Train/test split, feature scaling on `Time` and `Amount`.  
+3. **Baseline Model:** Logistic Regression (`class_weight='balanced'`).  
+4. **Advanced Model:** Random Forest Classifier.  
+5. **SMOTE:** Oversampling only on training data to balance the classes.  
+6. **Threshold Tuning:** Adjust classification threshold based on Precision–Recall curve.  
+7. **Feature Importance:** Extract top predictors from Random Forest.  
+8. **Save Artifacts:** Model, scaler, features, and threshold saved via joblib.
 
 ---
 
-## مدل‌سازی و عدم‌توازن
-- **Accuracy به‌تنهایی کافی نیست** (به‌دلیل کلاس اقلیت ~0.17%)  
-- متریک‌های اصلی: **Precision، Recall، F1، ROC-AUC، PR-AUC**  
-- **SMOTE** فقط روی `X_train, y_train` اعمال می‌شود (جلوگیری از **Data Leakage**)
+## ⚖️ Modeling and Class Imbalance
+Due to the severe imbalance (~0.17%), accuracy alone is misleading.  
+Key metrics include:
+- Precision (Fraud)
+- Recall (Fraud)
+- F1-score (Fraud)
+- ROC-AUC and PR-AUC
+
+SMOTE is applied **only on the training set** to prevent data leakage.
 
 ---
 
-## تنظیم آستانه (Threshold Tuning)
-پس از گرفتن احتمال‌ها با `predict_proba`:
-- آستانه‌ی با **بیشترین F1** را بیابید، یا
-- آستانه‌ای که **قیود کسب‌وکار** را برآورده کند (مثلاً: Recall ≥ 0.85 و Precision ≥ 0.80)
-- آستانه‌ی انتخابی در artifact ذخیره می‌شود (`models/rf_smote_v1.joblib`)
+## 🎚️ Threshold Tuning
+After obtaining predicted probabilities using `predict_proba`:
+- Find threshold maximizing **F1-score** or satisfying domain constraints.  
+- Example: Recall ≥ 0.85 while Precision ≥ 0.80.  
+- The chosen threshold is saved within the model artifact (`rf_smote_v1.joblib`).
 
 ---
 
-## اهمیت ویژگی‌ها
-با استفاده از **RandomForest feature_importances_**، معمولاً `V14`, `V10`, `V4`, `V12`, `V17` از مهم‌ترین‌ها هستند.  
-(این‌ها مؤلفه‌های نهفته‌ی PCAاند؛ قابل تفسیر دامنه‌ای مستقیم نیستند، اما الگوهای تفکیک‌کننده را حمل می‌کنند.)
+## 🔍 Feature Importance
+Random Forest feature importances typically highlight:
+`V14`, `V10`, `V4`, `V12`, `V17`  
+These represent PCA-transformed latent factors, useful for identifying fraud patterns.
 
 ---
 
-## نتایج نمونه
-*(ارقام نمونه—با نتایج خودتان به‌روزرسانی کنید)*
-
+## 🧾 Results
 | Model | Precision (Fraud) | Recall (Fraud) | F1 (Fraud) | ROC-AUC |
 |------|-------------------:|---------------:|-----------:|--------:|
 | Logistic Regression | 0.061 | **0.918** | 0.114 | 0.972 |
 | Random Forest       | **0.961** | 0.755 | 0.846 | 0.957 |
 | RF + SMOTE          | 0.863 | 0.837 | **0.850** | **0.975** |
 
-**جمع‌بندی:** پیکربندی **Random Forest + SMOTE** توازن بهتری بین Precision/Recall ایجاد کرده و برای کاربرد عملی مناسب‌تر است.
+**Summary:** The combination of **Random Forest + SMOTE** achieves the best balance between precision and recall.
 
 ---
 
-## ذخیره و استفاده از مدل
-مدل و ملحقات در یک artifact ذخیره می‌شود:
+## 💾 Model Saving and Inference
+Model artifacts are stored in:
 ```
 models/rf_smote_v1.joblib
 ```
-کد نمونه برای بارگذاری و امتیازدهی (scoring):
+
+### Example usage
 ```python
 import joblib, pandas as pd
 
@@ -167,9 +179,10 @@ artifact = joblib.load("models/rf_smote_v1.joblib")
 model     = artifact["model"]
 scaler    = artifact["scaler"]
 features  = artifact["features"]
-thr       = artifact["threshold"]  # tuned threshold
+thr       = artifact["threshold"]
 
-new_df = pd.read_csv("data/raw/creditcard.csv").sample(5, random_state=42).copy()
+# Example scoring
+new_df = pd.read_csv("data/raw/creditcard.csv").sample(5, random_state=42)
 new_df[["Time","Amount"]] = scaler.transform(new_df[["Time","Amount"]])
 X_new = new_df[features]
 
@@ -179,14 +192,14 @@ pred  = (proba >= thr).astype(int)
 
 ---
 
-## API اختیاری (FastAPI)
+## 🌐 Optional API (FastAPI)
 ```python
 # app.py
 from fastapi import FastAPI
 import joblib, pandas as pd
 
-art = joblib.load("models/rf_smote_v1.joblib")
-model, scaler, feats, thr = art["model"], art["scaler"], art["features"], art["threshold"]
+artifact = joblib.load("models/rf_smote_v1.joblib")
+model, scaler, features, thr = artifact["model"], artifact["scaler"], artifact["features"], artifact["threshold"]
 
 app = FastAPI()
 
@@ -194,11 +207,12 @@ app = FastAPI()
 def predict(payload: dict):
     df = pd.DataFrame([payload])
     df[["Time","Amount"]] = scaler.transform(df[["Time","Amount"]])
-    X = df[feats]
+    X = df[features]
     p = float(model.predict_proba(X)[:,1][0])
     y = int(p >= thr)
-    return {"prob_fraud": p, "pred": y}
+    return {"prob_fraud": p, "prediction": y}
 ```
+Run with:
 ```bash
 pip install fastapi uvicorn
 uvicorn app:app --reload --port 8000
@@ -206,12 +220,13 @@ uvicorn app:app --reload --port 8000
 
 ---
 
-## بهترین‌عمل‌ها برای داده‌ها
-- فایل‌های بزرگ (`*.csv`) را **کامیت نکنید**؛ از `.gitignore` استفاده کنید.  
-- لینک دیتاست را در README بگذارید و/یا اسکریپت دانلود (Kaggle API) اضافه کنید.  
-- برای نسخه‌بندی داده‌ها: **DVC** یا **Git LFS** (در صورت نیاز واقعی).
+## 🚫 Data Best Practices
+- Never commit large CSVs (>100MB).  
+- Use `.gitignore` to exclude them.  
+- Keep dataset links or add a Kaggle API downloader script.  
+- For data versioning, use **DVC** or **Git LFS**.
 
-نمونه `.gitignore` حداقلی:
+### Example `.gitignore`
 ```
 __pycache__/
 .ipynb_checkpoints/
@@ -224,30 +239,33 @@ data/processed/
 
 ---
 
-## توسعه‌دهی (Pre-commit/Makefile)
-- **pre-commit**: فرمت خودکار (Black/Isort) و چک‌ها قبل از هر commit  
-- **Makefile**: میانبرهای توسعه
+## 🧩 Development (Pre-commit/Makefile)
+### Pre-commit Hooks
+- Runs **Black**, **isort**, and **flake8** before each commit.
+
+### Makefile Shortcuts
 ```
-make install   # pip install -r requirements.txt + pre-commit install
-make format    # isort . && black .
-make lint      # flake8 src tests
-make test      # pytest
+make install   # install requirements + pre-commit
+make format    # run isort + black
+make lint      # run flake8
+make test      # run pytest
 ```
 
 ---
 
-## نقشه راه
-- Hyperparameter Tuning (Grid/Random/Optuna)  
-- Streamlit Dashboard برای دمو  
-- MLflow/W&B برای ردیابی آزمایش‌ها  
-- Dockerfile + CI/CD برای دیپلوی
+## 🚀 Roadmap
+- Hyperparameter tuning (GridSearchCV / Optuna)
+- Streamlit dashboard for model demo
+- MLflow or Weights & Biases for experiment tracking
+- Dockerfile and CI/CD pipeline for deployment
 
 ---
 
-## مجوز
-این مخزن تحت مجوز **MIT** منتشر شده است (فایل `LICENSE`).
+## 🪪 License
+This project is licensed under the **MIT License**.
 
 ---
 
-## سپاس
-سپاس از ULB Machine Learning Group بابت انتشار دیتاست مرجع و جامعه‌ی Kaggle برای آموزش‌های مرتبط.
+## 🙏 Acknowledgements
+- [ULB Machine Learning Group](https://mlg.ulb.ac.be) for providing the original dataset.  
+- Kaggle community for open-source discussions and notebooks.
